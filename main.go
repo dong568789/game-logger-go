@@ -17,20 +17,22 @@ func init() {
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
-	utils.InitLogger(viper.GetString("logDir"))
+	//初始化日志
+	utils.NewLogMgr()
+	//初始化埋点日志
 	logSave.InitCyLog(viper.GetString("cyLogDir"))
 }
 
 func main() {
 	r := gin.New()
-	//gin.DefaultWriter = utils.Logger
 
 	if viper.GetBool("debug") == true {
 		gin.SetMode(gin.DebugMode)
 	} else {
+		gin.DefaultWriter = utils.GinLoggerMgr
 		gin.SetMode(gin.ReleaseMode)
 	}
 	router.InitRouter(r)
-	r.Run(":8057") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	r.Run(":" + viper.GetString("httpPort")) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 
 }

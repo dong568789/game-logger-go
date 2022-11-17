@@ -8,10 +8,8 @@ import (
 	"time"
 )
 
-var Logger *logger
-
 //Logger 日志，实现了Write接口
-type logger struct {
+type Logger struct {
 	t    time.Time
 	fp   *os.File
 	path string
@@ -19,7 +17,7 @@ type logger struct {
 }
 
 //new 初始化
-func InitLogger(path string) {
+func NewLogger(path string) *Logger {
 	if path == "" {
 		path = "logs"
 	}
@@ -29,29 +27,30 @@ func InitLogger(path string) {
 			panic("无法创建runtime目录")
 		}
 	}
-	Logger = &logger{
+	l := &Logger{
 		t:    time.Now(),
 		path: path,
 	}
-	Logger.setLogfile()
+	l.setLogfile()
+	return l
 }
 
-func (l *logger) Info(format string, v ...interface{}) {
+func (l *Logger) Info(format string, v ...interface{}) {
 	msg := fmt.Sprintf(format, v...)
 	l.Println("Info", msg)
 }
 
-func (l *logger) Warning(format string, v ...interface{}) {
+func (l *Logger) Warning(format string, v ...interface{}) {
 	msg := fmt.Sprintf(format, v...)
 	l.Println("Warning", msg)
 }
 
-func (l *logger) Error(format string, v ...interface{}) {
+func (l *Logger) Error(format string, v ...interface{}) {
 	msg := fmt.Sprintf(format, v...)
 	l.Println("Error", msg)
 }
 
-func (l *logger) Println(prefix string, msg string) {
+func (l *Logger) Println(prefix string, msg string) {
 	msg = fmt.Sprintf(
 		"%s %s %s\n",
 		"["+prefix+"]",
@@ -62,7 +61,7 @@ func (l *logger) Println(prefix string, msg string) {
 }
 
 //Write 实现Write接口，用于写入
-func (l *logger) Write(msg []byte) (n int, err error) {
+func (l *Logger) Write(msg []byte) (n int, err error) {
 	today := dateToStr(time.Now())
 	loggerDate := dateToStr(l.t)
 
@@ -85,10 +84,8 @@ func (l *logger) Write(msg []byte) (n int, err error) {
 }
 
 //setLogfile 更新日志文件
-func (l *logger) setLogfile() error {
+func (l *Logger) setLogfile() error {
 	year, month, day := time.Now().Date()
-	//dir := fmt.Sprintf("logs/%d/%02d", year, month)
-	//
 	////锁住，防止并发时，多次执行创建。os.MkdirAll在目录存在时，也不会返回错误，锁不锁都行
 	l.m.Lock()
 	defer l.m.Unlock()

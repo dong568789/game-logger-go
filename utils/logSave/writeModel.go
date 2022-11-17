@@ -49,12 +49,13 @@ func (w *WriteModel) resetWriter() {
 	w.m.Lock()
 	defer w.m.Unlock()
 	if w.writer != nil {
+		w.writer.Close()
 		w.writer = nil
 	}
 
 	f, err := os.OpenFile(w.genFilePath(), os.O_RDWR|os.O_APPEND|os.O_CREATE, 0666)
 	if err != nil {
-		utils.Logger.Error("%v", err)
+		utils.LogMgr.Error("%v", err)
 		return
 	}
 	w.writer = f

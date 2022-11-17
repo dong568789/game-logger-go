@@ -50,10 +50,10 @@ func (m *WriteManage) scheduledTask() {
 	})
 
 	if err != nil {
-		utils.Logger.Error("全局定时器报错 error=%s", err)
+		utils.LogMgr.Error("全局定时器报错 error=%s", err)
 		return
 	}
-	utils.Logger.Info("全局定时器已开启，Id=%d", intervalId)
+	utils.LogMgr.Info("全局定时器已开启，Id=%d", intervalId)
 	c.Start()
 
 }
