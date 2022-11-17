@@ -1,4 +1,4 @@
-## 日志埋点记录
+## 鏃ュ織鍩嬬偣璁板綍
 
-启动方式  
+鍚姩鏂瑰紡  
 go build && ./game-logger-go
